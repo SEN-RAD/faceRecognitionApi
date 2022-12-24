@@ -1,0 +1,155 @@
+/*  backend
+
+npm init para crear el package.json
+instalar los paquetes body-parser, express y nodemon
+crear server.js
+en scripts, "start": nodemon server.js
+
+
+
+** Hacemos el esqueleto del server
+
+const express = require('express');
+
+const app = express();
+
+app.get('/', (req, res) => {
+	res.send('this is working');
+})
+
+app.listen(3000, () => {
+	console.log('app is running on port 3000');
+})
+
+
+
+
+** Despues deberiamos planear que vamos a hacer aqui con base en las funcionalidades que tiene el front-end (lo que necesitamos)
+
+en este caso , podemos considerar estos endpoints:
+
+/ --> res = this is working    (root, route)
+/signin --> POST = success/failure (como POST method para proteger el password)
+/register --> POST = user
+/profile/:userId --> GET = user
+/image --> PUT = user (put porque es update)
+
+
+
+** Este es mi post request para signin
+
+app.post('/signin', (req, res) =>{
+	res.send('signing in');
+})
+
+
+The guy in the video will be using - we receive a json string.
+
+	res.json('signing in');
+
+
+
+** Como no sabemos databases, por ahora vamos a usar una variable, que es un array de objects.
+
+const database = {
+	users: [
+	{
+		id: '123',
+		name: 'Jorge',
+		email: 'jorge@gmail.com',
+		password: 'secret',
+		entries: 0,
+		joined: new Date()    (esto es para saber cuando el usuario creo su cuenta)
+	},
+	{
+		id: '124',
+		name: 'Maria',
+		email: 'maria@gmail.com',
+		password: 'topsecret',
+		entries: 0,
+		joined: new Date()
+	}
+
+	]
+}
+
+
+** este es mi post request por ahora.
+Dice: si req body (lo que posteo) es igual a lo que tengo en mi database, responde con success, si no, responde con failure. 
+
+app.post('/signin', (req, res) =>{
+	if (req.body.email === database.users[0].email &&
+		req.body.password === database.users[0].password){
+	res.json('success');
+	} else {
+		res.status(400).json('error logging in');
+	}
+	
+})
+
+
+BUT THIS IS GOING TO GIVE AN ERROR, because if I want to post something, I need to parse it, so I need body parser. 
+
+app.use(express.json());
+
+
+
+
+** este es el post para register. dice: agarra del body email, name y password, crea un nuevo usario en el array con esa informacion y la response es el database.users.length-1 que significa el ultimo usuario del array
+
+app.post('/register', (req, res) => {
+	const { email, name, password } = req.body;
+	database.users.push({
+			id: '125',
+			name: name,
+			email: email,
+			password: password,
+			entries: 0,
+			joined: new Date()
+	})
+	res.json(database.users[database.users.length-1]);
+})
+
+
+** este es el GET request para profile id
+Dice, la id es lo que pongamos en los parametros.
+El default de usuario found es false.
+Ve sobre los usarios uno a uno y si la id de los param. matches la del usuario, cambia found a true y responde con json (el usuario).
+Si NOT found, responde con 404.
+
+app.get('/profile/:id', (req, res) => {
+	const { id } = req.params;
+	let found = false;
+	database.users.forEach(user => {
+		if (user.id === id) {
+			found = true;
+			return res.json(user);
+		} 
+	})
+	if (!found) {
+		res.status(404).json('user does not exist');
+	}
+})
+
+
+
+*** este es el PUT request para image
+la misma funcion que el anterior. dice, de acuerdo a esta id
+busca y si encuentras la id (el usuario), incrementa las entries
+(entries ++) y responde con user.entries, si no, error.
+
+
+app.put('/image', (req, res) => {
+	const { id } = req.body;
+	let found = false;
+	database.users.forEach(user => {
+		if (user.id === id) {
+			found = true;
+			user.entries++
+			return res.json(user.entries);
+		} 
+	})
+		if (!found) {
+		res.status(400).json('not found');
+	}
+})

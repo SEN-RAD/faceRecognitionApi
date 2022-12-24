@@ -1,0 +1,80 @@
+In the real world, we wont have passwords as text. We need to make that secure. We are going to use bcrypt nodejs, although its deprecated (hashing package).
+Always send sensitive information over https, as a post method and hashed. 
+En nuestra database agregamos la ultima parte.
+
+const database = {
+	users: [
+		{
+			id: '123',
+			name: 'Juan',
+			email: 'juan@gmail.com',
+			password: 'secret',
+			entries: 0,
+			joined: new Date()
+		},
+		{
+			id: '124',
+			name: 'Ana',
+			email: 'ana@gmail.com',
+			password: 'topsecret',
+			entries: 0,
+			joined: new Date()
+
+		}
+	],
+	login: [
+		{
+			id: '987',
+			hash: '',
+			email:'juan@gmail.com'
+		}
+	]
+}
+
+
+
+
+** instalamos bcrypt y agregamos la funcion a mi register post request
+
+app.post('/register', (req, res) => {
+	const { email, name, password } = req.body;
+	bcrypt.hash(password, null, null, function(err, hash) {     --->  esto
+});
+	database.users.push({
+			id: '125',
+			name: name,
+			email: email,
+			password: password,
+			entries: 0,
+			joined: new Date()
+	})
+	res.json(database.users[database.users.length-1]);
+})
+
+
+
+*** Bcrypt tiene tres funciones, para establecer o comparar los hashes.
+
+bcrypt.hash("bacon", null, null, function(err, hash) {
+    // Store hash in your password DB.
+});
+
+// Load hash from your password DB.
+bcrypt.compare("bacon", hash, function(err, res) {
+    // res == true
+});
+bcrypt.compare("veggies", hash, function(err, res) {
+    // res = false
+});
+
+
+
+
+
+
+
+
+
+***
+
+el servidor se creo con node y expressm el front-end con javascript y react.
