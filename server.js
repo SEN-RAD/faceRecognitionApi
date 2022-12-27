@@ -15,8 +15,6 @@ const db = knex({
     pguser : 'postgres',
     pgpassword : 'VCxPcXkZxxqZjVKSADj5',
     pgdatabase : 'railway',
-    pgport: '7385', 
-    ssl: true
   }
 });
 
