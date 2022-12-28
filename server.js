@@ -12,7 +12,7 @@ const image = require('./controllers/image');
 const db = knex({
   client: 'pg',
   connection: {
-    postgresql : '//postgres:VCxPcXkZxxqZjVKSADj5@containers-us-west-56.railway.app:7385/railway'
+    url: 'postgresql://postgres:VCxPcXkZxxqZjVKSADj5@containers-us-west-56.railway.app:7385/railway'
   }
 });
 
