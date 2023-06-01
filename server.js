@@ -11,10 +11,10 @@ const image = require('./controllers/image');
 const db = knex({
   client: 'pg',
   connection: {
-    host : 'containers-us-west-56.railway.app',
-    user : 'postgres',
-    password : 'VCxPcXkZxxqZjVKSADj5',
-    database : 'railway',
+    host: 'containers-us-west-56.railway.app',
+    user: 'postgres',
+    password: 'VCxPcXkZxxqZjVKSADj5',
+    database: 'railway',
     port: 7385,
     url: 'postgresql://postgres:VCxPcXkZxxqZjVKSADj5@containers-us-west-56.railway.app:7385/railway'
   }
@@ -27,13 +27,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req, res)=> {res.send(db.users);})
-app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt )})
-app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
-app.get('/profile/:id', (req, res)=> { profile.handleProfile(req, res, db) })
-app.put('/image', (req, res)=> { image.handleImage(req, res, db) }) 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://sen-rad.github.io');
+  next();
+});
 
-app.listen(PORT, ()=>{
-	console.log(`app is running on port ${PORT}`);
+
+app.get('/', (req, res) => { res.send(db.users); })
+app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
+app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
+app.get('/profile/:id', (req, res) => { profile.handleProfile(req, res, db) })
+app.put('/image', (req, res) => { image.handleImage(req, res, db) })
+
+app.listen(PORT, () => {
+  console.log(`app is running on port ${PORT}`);
 })
 
